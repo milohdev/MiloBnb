@@ -17,7 +17,7 @@ RUN dotnet publish src/Milo.Api/Milo.Api.csproj \
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
-RUN adduser --disabled-password --no-create-home appuser
+RUN useradd -r -s /bin/false appuser
 USER appuser
 
 COPY --from=build /app/publish .

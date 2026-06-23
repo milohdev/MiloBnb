@@ -23,6 +23,7 @@ builder.Services
     .AddJwtBearer(options =>
     {
         var jwt = builder.Configuration.GetSection("Jwt");
+        options.MapInboundClaims = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -32,7 +33,9 @@ builder.Services
             ValidIssuer = jwt["Issuer"],
             ValidAudience = jwt["Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwt["SecretKey"]!))
+                Encoding.UTF8.GetBytes(jwt["SecretKey"]!)),
+            RoleClaimType = "role",
+            NameClaimType = "sub"
         };
     });
 
