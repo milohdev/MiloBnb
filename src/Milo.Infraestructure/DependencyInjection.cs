@@ -26,6 +26,8 @@ public static class DependencyInjection
         services.AddScoped<IPropertyImageRepository, PropertyImageRepository>();
         services.AddScoped<IReservationRepository, ReservationRepository>();
         services.AddScoped<IWishlistRepository, WishlistRepository>();
+        services.AddScoped<IKycRepository, KycRepository>();
+        services.AddHttpClient<IKycService, ClaudeKycService>();
         services.AddScoped<AuditInterceptor>();
         services.AddDbContext<MiloDbContext>((sp, options) =>
             options

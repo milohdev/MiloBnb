@@ -4,16 +4,18 @@
 Ninguna.
 
 ## Última acción
-`wishlist` completada. T-01 a T-05 implementadas. `dotnet build` 0 errores, 0 warnings.
+`kyc` completada. T-01 a T-07 implementadas. `dotnet build` 0 errores, 0 warnings.
 
-Migration: `AddWishlist` — tabla WishlistItems con IAuditable fields, UNIQUE index en
-(GuestId, PropertyId), índice en GuestId, FKs Cascade a Properties y Users.
+Migration: `AddKycVerification` — tabla KycVerifications con Status varchar(20),
+ExtractedBirthDate date, FK Restrict a Users, índice en UserId.
 
-WishlistItem: no ISoftDeletable (delete físico). `DeleteAsync` idempotente en el repo.
-`GetByGuestIdAsync` usa Include → ThenInclude + filtro IsActive, OrderByDescending CreatedAt.
-`AddToWishlistHandler` verifica ExistsAsync antes de Add para respetar UNIQUE constraint.
-`GetWishlistHandler` reutiliza PropertyDto de Feature 2.
-`WishlistController` con [Authorize(Roles = "Guest")] a nivel de clase. POST → 200, DELETE → 204 siempre.
+KycVerification: no ISoftDeletable (registros de auditoría inmutables). Métodos Approve()/Reject()
+borran DocumentImageUrl antes de persistir. Commit único en VerifyKycHandler: kycRepository.SaveChangesAsync
+persiste KycVerification + User.IsKycVerified en un solo round-trip (misma instancia de DbContext).
+ClaudeKycService usa AddHttpClient<IKycService>, configura headers en constructor,
+parsea respuesta Anthropic buscando campo "error" o campos de extracción.
+KycController: [Authorize(Roles = "Guest")] a nivel de clase. POST /verify → 200/409.
+GET /status → 200/404.
 
 ## Siguiente paso
 Próxima feature a definir.
@@ -24,3 +26,4 @@ Próxima feature a definir.
 - properties (2026-06-23)
 - reservations (2026-06-23)
 - wishlist (2026-06-23)
+- kyc (2026-06-23)

@@ -24,6 +24,8 @@ public sealed class User : BaseEntity, IAuditable, ISoftDeletable
     public bool IsDeleted { get; set; }
     public DateTime? DeletedAt { get; set; }
 
+    public void MarkKycVerified() => IsKycVerified = true;
+
     public static User Create(
         string firstName,
         string lastName,
