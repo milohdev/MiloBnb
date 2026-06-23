@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Milo.Api/Milo.Api.csproj" />
+    <Project Path="src/Milo.Application/Milo.Application.csproj" />
+    <Project Path="src/Milo.Domain/Milo.Domain.csproj" />
+    <Project Path="src/Milo.Infraestructure/Milo.Infraestructure.csproj" />
+  </Folder>
+</Solution>

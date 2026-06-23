@@ -1,0 +1,25 @@
+# ----- Build output -----
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+*.user
+*.suo
+
+# ----- Logs -----
+logs/
+*.log
+
+# ----- Entorno (secretos) -----
+.env
+.env.*
+!.env.example
+
+# ----- IDE -----
+.vs/
+.idea/
+*.DotSettings.user
+
+# ----- SO -----
+.DS_Store
+Thumbs.db
