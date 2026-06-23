@@ -1,6 +1,0 @@
-@Milo.Api_HostAddress = http://localhost:5122
-
-GET {{Milo.Api_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
