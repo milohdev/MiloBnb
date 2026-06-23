@@ -12,6 +12,7 @@ public sealed class MiloDbContext(DbContextOptions<MiloDbContext> options) : DbC
     public DbSet<Property> Properties => Set<Property>();
     public DbSet<PropertyImage> PropertyImages => Set<PropertyImage>();
     public DbSet<Reservation> Reservations => Set<Reservation>();
+    public DbSet<WishlistItem> WishlistItems => Set<WishlistItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

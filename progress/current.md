@@ -4,22 +4,23 @@
 Ninguna.
 
 ## Última acción
-`reservations` completada. T-01 a T-08 implementadas. `dotnet build` 0 errores, 0 warnings.
+`wishlist` completada. T-01 a T-05 implementadas. `dotnet build` 0 errores, 0 warnings.
 
-Migration: `AddReservations` — tabla Reservations con TotalPrice numeric(18,2), Status varchar(20),
-FKs Restrict a Properties y Users, índices en GuestId, PropertyId y compuesto (PropertyId, CheckInDate, CheckOutDate).
+Migration: `AddWishlist` — tabla WishlistItems con IAuditable fields, UNIQUE index en
+(GuestId, PropertyId), índice en GuestId, FKs Cascade a Properties y Users.
 
-TODO Feature 3 cerrado: PropertyRepository.GetAllAsync filtra con subconsulta EF sobre
-dbContext.Reservations (Status != Cancelled, solapamiento CheckInDate/CheckOutDate).
-
-Prevención de double-booking: TryCreateSerializableAsync en ReservationRepository abre
-transacción IsolationLevel.Serializable, verifica solapamiento, inserta o hace rollback.
+WishlistItem: no ISoftDeletable (delete físico). `DeleteAsync` idempotente en el repo.
+`GetByGuestIdAsync` usa Include → ThenInclude + filtro IsActive, OrderByDescending CreatedAt.
+`AddToWishlistHandler` verifica ExistsAsync antes de Add para respetar UNIQUE constraint.
+`GetWishlistHandler` reutiliza PropertyDto de Feature 2.
+`WishlistController` con [Authorize(Roles = "Guest")] a nivel de clase. POST → 200, DELETE → 204 siempre.
 
 ## Siguiente paso
-Próxima feature a definir (KYC, wishlist, dashboard, etc.)
+Próxima feature a definir.
 
 ## Features completadas
 - infrastructure-setup (2026-06-23)
 - auth (2026-06-23)
 - properties (2026-06-23)
 - reservations (2026-06-23)
+- wishlist (2026-06-23)
