@@ -35,6 +35,16 @@ public sealed class ClaudeKycService : IKycService
     {
         try
         {
+            
+            await Task.Delay(300, cancellationToken);
+            return new KycExtractionResult(
+                FirstName: "Juan Guest",
+                LastName: "Hernández",
+                DocumentNumber: "10203040",
+                BirthDate: new DateOnly(1998, 5, 20),
+                IsSuccessful: true,
+                FailureReason: null);
+            /*
             var requestBody = new
             {
                 model = Model,
@@ -99,6 +109,8 @@ public sealed class ClaudeKycService : IKycService
             return new KycExtractionResult(
                 firstName, lastName, documentNumber, birthDate,
                 IsSuccessful: true, FailureReason: null);
+            
+            */
         }
         catch
         {

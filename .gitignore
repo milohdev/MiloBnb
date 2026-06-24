@@ -23,3 +23,8 @@ logs/
 # ----- SO -----
 .DS_Store
 Thumbs.db
+
+# tracking and progress
+CLAUDE.md
+CHECKPOINTS.md
+progress/
