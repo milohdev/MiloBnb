@@ -14,6 +14,7 @@ public sealed class MiloDbContext(DbContextOptions<MiloDbContext> options) : DbC
     public DbSet<Reservation> Reservations => Set<Reservation>();
     public DbSet<WishlistItem> WishlistItems => Set<WishlistItem>();
     public DbSet<KycVerification> KycVerifications => Set<KycVerification>();
+    public DbSet<Notification> Notifications => Set<Notification>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

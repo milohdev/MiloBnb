@@ -1,5 +1,7 @@
 using System.Text;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -74,7 +76,28 @@ await using (var scope = app.Services.CreateAsyncScope())
     await DbSeeder.SeedAsync(scope.ServiceProvider, builder.Configuration);
 }
 
-app.UseExceptionHandler();
+app.UseExceptionHandler(exceptionHandlerApp =>
+{
+    exceptionHandlerApp.Run(async context =>
+    {
+        var exceptionFeature = context.Features.Get<IExceptionHandlerFeature>();
+        if (exceptionFeature?.Error is ValidationException validationException)
+        {
+            context.Response.StatusCode = 400;
+            context.Response.ContentType = "application/problem+json";
+            var errors = validationException.Errors
+                .GroupBy(e => e.PropertyName)
+                .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
+            await context.Response.WriteAsJsonAsync(new
+            {
+                type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                title = "Validation failed",
+                status = 400,
+                errors
+            });
+        }
+    });
+});
 
 if (app.Environment.IsDevelopment())
 {

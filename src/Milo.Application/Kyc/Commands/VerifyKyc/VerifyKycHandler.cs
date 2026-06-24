@@ -12,6 +12,7 @@ public sealed class VerifyKycHandler(
     IKycRepository kycRepository,
     IKycService kycService,
     IUserRepository userRepository,
+    INotificationService notificationService,
     ICurrentUserProvider currentUser) : IRequestHandler<VerifyKycCommand, Result<KycVerificationDto>>
 {
     public async Task<Result<KycVerificationDto>> Handle(
@@ -43,6 +44,15 @@ public sealed class VerifyKycHandler(
         }
 
         await kycRepository.SaveChangesAsync(cancellationToken);
+
+        if (verification.Status == KycStatus.Approved)
+            await notificationService.SendAsync(userId, "Identidad verificada",
+                "Tu identidad fue verificada exitosamente. Ya puedes realizar reservas.",
+                NotificationType.KycApproved, relatedEntityId: verification.Id, cancellationToken);
+        else
+            await notificationService.SendAsync(userId, "Verificación rechazada",
+                $"No pudimos verificar tu identidad. Motivo: {verification.RejectionReason}",
+                NotificationType.KycRejected, relatedEntityId: verification.Id, cancellationToken);
 
         return Result<KycVerificationDto>.Success(ToDto(verification));
     }

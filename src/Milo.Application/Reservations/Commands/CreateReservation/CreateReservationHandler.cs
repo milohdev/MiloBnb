@@ -3,6 +3,7 @@ using Milo.Application.Common.Interfaces;
 using Milo.Application.Common.Models;
 using Milo.Application.Reservations.Queries.GetMyReservations;
 using Milo.Domain.Entities;
+using Milo.Domain.Entities.Enums;
 using Milo.Domain.Repositories;
 
 namespace Milo.Application.Reservations.Commands.CreateReservation;
@@ -11,6 +12,7 @@ public sealed class CreateReservationHandler(
     IPropertyRepository propertyRepository,
     IUserRepository userRepository,
     IReservationRepository reservationRepository,
+    INotificationService notificationService,
     ICurrentUserProvider currentUser) : IRequestHandler<CreateReservationCommand, Result<ReservationDto>>
 {
     public async Task<Result<ReservationDto>> Handle(
@@ -48,7 +50,20 @@ public sealed class CreateReservationHandler(
             return Result<ReservationDto>.Failure("Las fechas seleccionadas no están disponibles");
 
         var full = await reservationRepository.GetByIdAsync(reservation.Id, cancellationToken);
-        return Result<ReservationDto>.Success(ToDto(full!));
+
+        var propertyName = full!.Property.Name;
+        var checkIn = full.CheckInDate.ToString("dd/MM/yyyy");
+        var checkOut = full.CheckOutDate.ToString("dd/MM/yyyy");
+
+        await notificationService.SendAsync(full.GuestId, "Reserva confirmada",
+            $"Tu reserva en {propertyName} del {checkIn} al {checkOut} fue confirmada.",
+            NotificationType.ReservationConfirmed, relatedEntityId: full.Id, cancellationToken);
+
+        await notificationService.SendAsync(full.Property.OwnerId, "Nueva reserva",
+            $"Tienes una nueva reserva en {propertyName} del {checkIn} al {checkOut}.",
+            NotificationType.ReservationConfirmed, relatedEntityId: full.Id, cancellationToken);
+
+        return Result<ReservationDto>.Success(ToDto(full));
     }
 
     private static ReservationDto ToDto(Reservation r) =>

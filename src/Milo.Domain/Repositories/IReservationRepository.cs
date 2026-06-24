@@ -16,5 +16,15 @@ public interface IReservationRepository
     /// Retorna false si ya existe una reserva solapada (sin lanzar excepción).
     /// </summary>
     Task<bool> TryCreateSerializableAsync(Reservation reservation, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<Reservation>> GetConfirmedByOwnerAsync(
+        Guid ownerId, DateOnly from, DateOnly to, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<Reservation>> GetConfirmedByPropertyAsync(
+        Guid propertyId, DateOnly from, DateOnly to, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<Reservation>> GetConfirmedForReportAsync(
+        Guid ownerId,
+        Guid? propertyId,
+        DateOnly? from,
+        DateOnly? to,
+        CancellationToken cancellationToken = default);
     Task SaveChangesAsync(CancellationToken cancellationToken = default);
 }

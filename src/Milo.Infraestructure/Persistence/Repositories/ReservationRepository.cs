@@ -67,6 +67,44 @@ public sealed class ReservationRepository(MiloDbContext dbContext) : IReservatio
         return true;
     }
 
+    public async Task<IReadOnlyList<Reservation>> GetConfirmedByOwnerAsync(
+        Guid ownerId, DateOnly from, DateOnly to, CancellationToken cancellationToken = default)
+        => await dbContext.Reservations
+               .Where(r => r.Property.OwnerId == ownerId
+                        && r.Status == ReservationStatus.Confirmed
+                        && r.CheckInDate >= from
+                        && r.CheckInDate <= to)
+               .ToListAsync(cancellationToken);
+
+    public async Task<IReadOnlyList<Reservation>> GetConfirmedByPropertyAsync(
+        Guid propertyId, DateOnly from, DateOnly to, CancellationToken cancellationToken = default)
+        => await dbContext.Reservations
+               .Where(r => r.PropertyId == propertyId
+                        && r.Status == ReservationStatus.Confirmed
+                        && r.CheckInDate >= from
+                        && r.CheckInDate <= to)
+               .ToListAsync(cancellationToken);
+
+    public async Task<IReadOnlyList<Reservation>> GetConfirmedForReportAsync(
+        Guid ownerId, Guid? propertyId, DateOnly? from, DateOnly? to,
+        CancellationToken cancellationToken = default)
+    {
+        var query = dbContext.Reservations
+            .Include(r => r.Property)
+            .Include(r => r.Guest)
+            .Where(r => r.Property.OwnerId == ownerId
+                     && r.Status == ReservationStatus.Confirmed);
+
+        if (propertyId.HasValue)
+            query = query.Where(r => r.PropertyId == propertyId.Value);
+        if (from.HasValue)
+            query = query.Where(r => r.CheckInDate >= from.Value);
+        if (to.HasValue)
+            query = query.Where(r => r.CheckInDate <= to.Value);
+
+        return await query.OrderBy(r => r.CheckInDate).ToListAsync(cancellationToken);
+    }
+
     public Task SaveChangesAsync(CancellationToken cancellationToken = default)
         => dbContext.SaveChangesAsync(cancellationToken);
 }
