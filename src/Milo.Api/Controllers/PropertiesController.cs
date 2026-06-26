@@ -8,6 +8,7 @@ using Milo.Application.Properties.Commands.DeleteProperty;
 using Milo.Application.Properties.Commands.DeletePropertyImage;
 using Milo.Application.Properties.Commands.UpdateProperty;
 using Milo.Application.Properties.Queries.GetProperties;
+using Milo.Application.Properties.Queries.GetMyProperties;
 using Milo.Application.Properties.Queries.GetPropertyById;
 
 namespace Milo.Api.Controllers;
@@ -33,6 +34,14 @@ public sealed class PropertiesController(ISender sender) : ControllerBase
         return result.IsSuccess
             ? Ok(result.Value)
             : Problem(title: result.Error, statusCode: StatusCodes.Status404NotFound);
+    }
+
+    [Authorize(Roles = "Owner")]
+    [HttpGet("mine")]
+    public async Task<IActionResult> GetMine(CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(new GetMyPropertiesQuery(), cancellationToken);
+        return Ok(result.Value);
     }
 
     [Authorize(Roles = "Owner")]
